@@ -1,16 +1,21 @@
+from __future__ import annotations
 import numpy as np
 import csv
 
 
 class LinearRegression:
 
-    def __init__(self, learning_rate=0.01, theta_0=0.0, theta_1=0.0, epochs=0):
+    def __init__(self,
+                 learning_rate=0.01,
+                 theta_0=0.0,
+                 theta_1=0.0,
+                 epochs=0) -> None:
         self.theta_0: float = theta_0
         self.theta_1: float = theta_1
         self.learning_rate: float = learning_rate
         self.epochs: np.integer = epochs
 
-    def fit(self):
+    def fit(self) -> None:
         maxX = max(self.X)
         maxY = max(self.Y)
         self.X /= maxX
@@ -22,17 +27,22 @@ class LinearRegression:
         self.X *= maxX
         self.Y *= maxY
 
-    def predict(self, X):
+    def predict(self, X) -> float:
         return self.__linear_model(X)
 
-    def precision(self):
+    def precision(self) -> float:
         Y = self.Y
         X = self.X
         m = self.m
         return sum((Y - abs(Y - self.__linear_model(X))) / Y) / m * 100
 
-    @staticmethod
-    def read_csv(path, learning_rate=0.01, theta_0=0.0, theta_1=0.0, epochs=0):
+    @classmethod
+    def read_csv(cls,
+                 path,
+                 learning_rate=0.01,
+                 theta_0=0.0,
+                 theta_1=0.0,
+                 epochs=0) -> LinearRegression:
         try:
             X = np.array([])
             Y = np.array([])
@@ -44,7 +54,7 @@ class LinearRegression:
                         X = np.append(X, float(row[0]))
                         Y = np.append(Y, float(row[1]))
                     i += 1
-            obj = LinearRegression(learning_rate, theta_0, theta_1, epochs)
+            obj = cls(learning_rate, theta_0, theta_1, epochs)
             obj.X = X
             obj.Y = Y
             obj.m = len(X)
