@@ -20,9 +20,9 @@ class DSLR:
             std = np.sqrt(((column - mean)**2).sum() / (column.size - 1))
             describe_df[column_name] = [
                 column.size, mean, std, column.iloc[0],
-                self.__get_quantile__(column, 1),
-                self.__get_quantile__(column, 2),
-                self.__get_quantile__(column, 3), column.iloc[column.size - 1]
+                self.__get_quartile(column, 1),
+                self.__get_quartile(column, 2),
+                self.__get_quartile(column, 3), column.iloc[column.size - 1]
             ]
         return describe_df
 
@@ -36,13 +36,13 @@ class DSLR:
         except Exception:
             print('Something went wrong.')
 
-    def __get_quantile__(self, column, q_quantile) -> float:
-        # quantile position
-        qu_p = q_quantile * .25 * (column.size - 1)
-        # quantile index
+    def __get_quartile(self, column, q_quartile) -> float:
+        # quartile position
+        qu_p = q_quartile * .25 * (column.size - 1)
+        # quartile index
         qu_i = int(qu_p)
-        # quantile position fraction part
+        # quartile position fraction part
         qu_fract = qu_p - int(qu_i)
-        quantile = column.iloc[qu_i] * (
+        quartile = column.iloc[qu_i] * (
             1 - qu_fract) + column.iloc[qu_i + 1] * qu_fract
-        return quantile
+        return quartile
