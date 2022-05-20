@@ -1,8 +1,9 @@
 from __future__ import annotations
-import numpy as np
+from pydoc import describe
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 import math
 
 
@@ -10,6 +11,9 @@ class DSLR:
 
     def __init__(self, dataframe: pd.DataFrame) -> None:
         self.data = dataframe
+        sns.set(font_scale=0.8)
+        sns.set_style("ticks")
+        sns.set_palette('RdBu_r')
 
     def describe(self) -> pd.DataFrame:
         df = self.data
@@ -29,23 +33,52 @@ class DSLR:
             ]
         return describe_df
 
-    def show_histogram(self, ncols: int = 3, figsize=(12, 12)):
-        sns.set_style("whitegrid")
-        sns.set(font_scale=0.8)
-        df = self.data.select_dtypes(include=['float64'])
-        fig, axs = plt.subplots(math.ceil(df.shape[1] / ncols),
-                                ncols,
-                                figsize=figsize)
-        x = 0
+    def show_histogram(self, figsize=(25, 10)):
+        fig, axs = plt.subplots(4, 13, figsize=figsize)
+        sns.despine()
+        houses = ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]
         y = 0
-        for column_name in df:
-            p = sns.histplot(data=df, x=column_name, ax=axs[y, x])
-            p.set_ylabel("Frequency")
-            x += 1
-            if x == ncols:
-                x = 0
-                y += 1
+        describ_df = self.describe()
+        # print(describ_df)
+        for h in houses:
+            x = 0
+            house_df = self.data[self.data["Hogwarts House"] ==
+                                 h].select_dtypes(include=['float64'])
+            for column_name in house_df:
+                house_df[column_name] = (house_df[column_name] -
+                                         describ_df[column_name]['Min']) / (
+                                             describ_df[column_name]['Max'] -
+                                             describ_df[column_name]['Min'])
+                s = sns.histplot(
+                    data=house_df,
+                    x=column_name,
+                    ax=axs[y, x],
+                    stat='count',
+                )
+                if x != 0:
+                    s.set_ylabel('')
+                else:
+                    s.set_ylabel(h)
+                x += 1
+            y += 1
         plt.tight_layout()
+        plt.show()
+
+    def show_scatter(self):
+        g = sns.PairGrid(
+            self.data,
+            vars=[
+                'Arithmancy', 'Astronomy', 'Herbology',
+                'Defense Against the Dark Arts', 'Divination',
+                'Muggle Studies', 'Ancient Runes', 'History of Magic',
+                'Transfiguration', 'Potions', 'Care of Magical Creatures',
+                'Charms', 'Flying'
+            ],
+            hue="Hogwarts House",
+        )
+
+        g.map_offdiag(sns.scatterplot)
+        g.add_legend()
         plt.show()
 
     @classmethod
