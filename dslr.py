@@ -56,17 +56,28 @@ class DSLR:
         plt.tight_layout()
         plt.show()
 
-    def show_scatter(self):
+    def show_scatter_plot(self):
+        ax = sns.scatterplot(
+            data=self.data,
+            x=self.data["Astronomy"],
+            y=self.data["Defense Against the Dark Arts"],
+            linewidth=0,
+        )
+        plt.tight_layout()
+        plt.show()
+
+    def show_pair_plot(self):
         df = self.data.drop([
             "First Name", "Last Name", "Birthday", "Best Hand", "Index",
-            "Arithmancy", "Astronomy", "Potions", "Care of Magical Creatures"
+            "Arithmancy", "Defense Against the Dark Arts", "Potions",
+            "Care of Magical Creatures"
         ],
                             axis=1)
 
         columns_len = df.shape[1]
         fig, axs = plt.subplots(columns_len - 1,
                                 columns_len - 1,
-                                figsize=(15 + 3, 10 + 3))
+                                figsize=(20, 13))
         sns.despine()
         y = 0
         for column_y in df:
@@ -82,6 +93,8 @@ class DSLR:
                                       ax=axs[y, x],
                                       hue="Hogwarts House",
                                       legend=False)
+                    if x == 0:
+                        ax.set(ylabel=column_y)
                 else:
                     ax = sns.scatterplot(data=df,
                                          x=column_x,
