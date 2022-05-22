@@ -13,7 +13,6 @@ class DSLR:
         self.data = dataframe
         sns.set(font_scale=0.8)
         sns.set_style("ticks")
-        sns.set_palette('RdBu_r')
 
     def describe(self) -> pd.DataFrame:
         df = self.data
@@ -33,52 +32,73 @@ class DSLR:
             ]
         return describe_df
 
-    def show_histogram(self, figsize=(25, 10)):
-        fig, axs = plt.subplots(4, 13, figsize=figsize)
+    def show_histogram(self, ncols: int = 4, figsize=(14, 10)):
+        df = self.data.drop(
+            ["First Name", "Last Name", "Birthday", "Best Hand", "Index"],
+            axis=1)
+        fig, axs = plt.subplots(math.ceil(df.shape[1] / ncols),
+                                ncols,
+                                figsize=figsize)
         sns.despine()
-        houses = ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]
+        x = 0
         y = 0
-        describ_df = self.describe()
-        # print(describ_df)
-        for h in houses:
-            x = 0
-            house_df = self.data[self.data["Hogwarts House"] ==
-                                 h].select_dtypes(include=['float64'])
-            for column_name in house_df:
-                house_df[column_name] = (house_df[column_name] -
-                                         describ_df[column_name]['Min']) / (
-                                             describ_df[column_name]['Max'] -
-                                             describ_df[column_name]['Min'])
-                s = sns.histplot(
-                    data=house_df,
-                    x=column_name,
-                    ax=axs[y, x],
-                    stat='count',
-                )
-                if x != 0:
-                    s.set_ylabel('')
-                else:
-                    s.set_ylabel(h)
-                x += 1
-            y += 1
+        for column_name in df:
+            if column_name == "Hogwarts House":
+                continue
+            p = sns.histplot(data=df,
+                             x=column_name,
+                             ax=axs[y, x],
+                             hue="Hogwarts House")
+            x += 1
+            if x == ncols:
+                x = 0
+                y += 1
         plt.tight_layout()
         plt.show()
 
     def show_scatter(self):
-        g = sns.PairGrid(
-            self.data,
-            vars=[
-                'Arithmancy', 'Astronomy', 'Herbology',
-                'Defense Against the Dark Arts', 'Divination',
-                'Muggle Studies', 'Ancient Runes', 'History of Magic',
-                'Transfiguration', 'Potions', 'Care of Magical Creatures',
-                'Charms', 'Flying'
-            ],
-            hue="Hogwarts House",
-        )
+        df = self.data.drop([
+            "First Name", "Last Name", "Birthday", "Best Hand", "Index",
+            "Arithmancy", "Astronomy", "Potions", "Care of Magical Creatures"
+        ],
+                            axis=1)
 
-        g.map_offdiag(sns.scatterplot)
-        g.add_legend()
+        columns_len = df.shape[1]
+        fig, axs = plt.subplots(columns_len - 1,
+                                columns_len - 1,
+                                figsize=(15 + 3, 10 + 3))
+        sns.despine()
+        y = 0
+        for column_y in df:
+            x = 0
+            if column_y == "Hogwarts House":
+                continue
+            for column_x in df:
+                if column_x == "Hogwarts House":
+                    continue
+                if (column_x == column_y):
+                    ax = sns.histplot(data=df,
+                                      x=column_x,
+                                      ax=axs[y, x],
+                                      hue="Hogwarts House",
+                                      legend=False)
+                else:
+                    ax = sns.scatterplot(data=df,
+                                         x=column_x,
+                                         y=column_y,
+                                         ax=axs[y, x],
+                                         hue="Hogwarts House",
+                                         legend=False,
+                                         alpha=0.5,
+                                         linewidth=0,
+                                         s=8)
+                if x != 0:
+                    ax.set(ylabel=None)
+                if y != columns_len - 2:
+                    ax.set(xlabel=None)
+                x += 1
+            y += 1
+        plt.tight_layout()
         plt.show()
 
     @classmethod
