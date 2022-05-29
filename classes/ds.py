@@ -1,8 +1,4 @@
 from __future__ import annotations
-from cProfile import label
-from pickle import TRUE
-from pydoc import describe
-from typing import Any
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -12,17 +8,15 @@ import math
 sns.set(font_scale=0.8)
 sns.set_style("ticks")
 sns.color_palette("bright")
-plt.rcParams["figure.subplot.right"] = 0.8
 
 
-class DSLR:
+class DS:
 
     def __init__(self, dataframe: pd.DataFrame) -> None:
         self.data = dataframe
 
     def describe(self) -> pd.DataFrame:
-        df = self.data
-        df = df.select_dtypes(include=['int64', 'float64'])
+        df = self.data.select_dtypes(include=['int64', 'float64'])
         describe_df = pd.DataFrame(
             index=["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"])
 
@@ -32,13 +26,17 @@ class DSLR:
             std = np.sqrt(((column - mean)**2).sum() / (column.size - 1))
             describe_df[column_name] = [
                 column.size, mean, std, column.iloc[0],
-                self.__get_quartile(column, 1),
-                self.__get_quartile(column, 2),
-                self.__get_quartile(column, 3), column.iloc[column.size - 1]
+                self._get_quartile(column, 1),
+                self._get_quartile(column, 2),
+                self._get_quartile(column, 3), column.iloc[column.size - 1]
             ]
         return describe_df
 
-    def show_histogram(self, ncols: int = 4, figsize=(16, 12), show_all=False):
+    def show_histogram(self,
+                       ncols: int = 4,
+                       figsize=(16, 12),
+                       show_all=False,
+                       kde=False):
         if show_all == False:
             df = self.data[[
                 "Hogwarts House", "Arithmancy", "Care of Magical Creatures",
@@ -61,20 +59,18 @@ class DSLR:
             if column_name == "Hogwarts House":
                 continue
             ax = axs[x] if nrows == 1 else axs[y, x]
-            hist = sns.histplot(
-                data=df,
-                x=column_name,
-                ax=ax,
-                hue="Hogwarts House",
-                alpha=0.6,
-                linewidth=0,
-            )
+            hist = sns.histplot(data=df,
+                                x=column_name,
+                                ax=ax,
+                                hue="Hogwarts House",
+                                alpha=0.6,
+                                linewidth=0,
+                                kde=kde)
             hist.set_xlabel(column_name.replace(' ', '\n', 2))
             x += 1
             if x == ncols:
                 x = 0
                 y += 1
-                show_legend = False
         for i in range(x, ncols):
             for j in range(y, nrows):
                 fig.delaxes(axs[j][i])
@@ -92,15 +88,15 @@ class DSLR:
                             x=self.data["Astronomy"],
                             y=self.data["Defense Against the Dark Arts"],
                             linewidth=0,
-                            s=8,
+                            s=10,
                             hue="Hogwarts House")
-            fig.suptitle("Two similar Features", fontsize=16)
+            fig.suptitle("Two similar features", fontsize=16)
             plt.tight_layout()
             plt.show()
         else:
             self.show_pair_plot(show_all)
 
-    def show_pair_plot(self, show_all=False):
+    def show_pair_plot(self, show_all=False, figsize=(18, 12)):
         show_legend = True
         if show_all == False:
             df = self.data.drop([
@@ -117,7 +113,7 @@ class DSLR:
         columns_len = df.shape[1]
         fig, axs = plt.subplots(columns_len - 1,
                                 columns_len - 1,
-                                figsize=(17, 12))
+                                figsize=figsize)
         sns.despine()
         y = 0
         for column_y in df:
@@ -146,14 +142,15 @@ class DSLR:
                                            legend=show_legend,
                                            alpha=0.5,
                                            linewidth=0,
-                                           s=8)
+                                           s=7)
                     if show_legend:
                         plot.legend(bbox_to_anchor=(1, 0.5),
                                     loc="center right",
                                     bbox_transform=fig.transFigure)
                         show_legend = False
-                plot.axes.xaxis.set_ticks([])
-                plot.axes.yaxis.set_ticks([])
+                if show_all == True:
+                    plot.axes.xaxis.set_ticks([])
+                    plot.axes.yaxis.set_ticks([])
                 if x != 0:
                     plot.set(ylabel=None)
                 else:
@@ -166,22 +163,32 @@ class DSLR:
             y += 1
         if show_all == False:
             fig.suptitle("Pair plot of the remaining features", fontsize=16)
-            plt.subplots_adjust(left=0.04, bottom=0.05, right=0.93, top=0.95)
+            plt.subplots_adjust(left=0.04,
+                                bottom=0.05,
+                                right=0.93,
+                                top=0.95,
+                                hspace=0.4,
+                                wspace=0.4)
         else:
-            plt.subplots_adjust(left=0.04, bottom=0.05, right=0.93, top=0.97)
+            plt.subplots_adjust(left=0.04,
+                                bottom=0.05,
+                                right=0.93,
+                                top=0.97,
+                                wspace=0.1,
+                                hspace=0.1)
         plt.show()
 
     @classmethod
-    def read_csv(cls, path: str) -> DSLR:
+    def read_csv(cls, path: str) -> DS:
         try:
             data = pd.read_csv(path)
             return cls(dataframe=data)
-        except OSError:
-            print('The training file does\'t exist.')
+        except OSError as e:
+            raise Exception(f'{path} file doesn\'t exist.')
         except Exception:
-            print('Something went wrong.')
+            raise Exception('Something went wrong.')
 
-    def __get_quartile(self, column, q_quartile) -> float:
+    def _get_quartile(self, column, q_quartile) -> float:
         # quartile position
         qu_p = q_quartile * .25 * (column.size - 1)
         # quartile index

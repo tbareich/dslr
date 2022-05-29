@@ -20,7 +20,7 @@ class LinearRegression:
         maxY = max(self.Y)
         self.X /= maxX
         self.Y /= maxY
-        is_updated = self.__update_weights()
+        is_updated = self._update_weights()
         if is_updated:
             self.theta_0 *= maxY
             self.theta_1 *= maxY / maxX
@@ -28,13 +28,13 @@ class LinearRegression:
         self.Y *= maxY
 
     def predict(self, X) -> float:
-        return self.__linear_model(X)
+        return self._linear_model(X)
 
     def precision(self) -> float:
         Y = self.Y
         X = self.X
         m = self.m
-        return sum((Y - abs(Y - self.__linear_model(X))) / Y) / m * 100
+        return sum((Y - abs(Y - self._linear_model(X))) / Y) / m * 100
 
     @classmethod
     def read_csv(cls,
@@ -60,21 +60,21 @@ class LinearRegression:
             obj.m = len(X)
             return obj
         except OSError:
-            print('The training file does\'t exist.')
+            raise Exception('The training file does\'t exist.')
         except Exception:
-            print('Something went wrong.')
+            raise Exception('Something went wrong.')
 
-    def __linear_model(self, X):
+    def _linear_model(self, X):
         return self.theta_0 + self.theta_1 * X
 
-    def __update_weights(self):
+    def _update_weights(self):
         X = self.X
         Y = self.Y
         if self.epochs == 0:
             return 0
         while self.epochs:
-            tmp_theta_0 = (1 / self.m) * sum(self.__linear_model(X) - Y)
-            tmp_theta_1 = (1 / self.m) * sum(X * (self.__linear_model(X) - Y))
+            tmp_theta_0 = (1 / self.m) * sum(self._linear_model(X) - Y)
+            tmp_theta_1 = (1 / self.m) * sum(X * (self._linear_model(X) - Y))
             self.theta_0 -= self.learning_rate * tmp_theta_0
             self.theta_1 -= self.learning_rate * tmp_theta_1
             self.epochs -= 1

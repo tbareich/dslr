@@ -1,21 +1,24 @@
-from classes.dslr import DSLR
+from classes.ds import DS
 import argparse
 
-parser = argparse.ArgumentParser(description='show data histogram plot.')
+try:
+    parser = argparse.ArgumentParser(description='show data histogram plot.')
 
-parser.add_argument('filename',
-                    type=str,
-                    help='the file containing the training data.')
-parser.add_argument('--show_all',
-                    action='store_const',
-                    const=True,
-                    default=False,
-                    help='show all features histogram.')
+    parser.add_argument('filename',
+                        type=str,
+                        help='the file containing the training data.')
+    parser.add_argument('--show_all',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        help='show all features histogram.')
 
-args = parser.parse_args()
-filename = args.filename
-show_all = args.show_all
+    args = parser.parse_args()
+    filename = args.filename
+    show_all = args.show_all
 
-dslr = DSLR.read_csv(filename)
+    ds = DS.read_csv(filename)
 
-dslr.show_histogram(show_all=show_all)
+    ds.show_histogram(show_all=show_all)
+except Exception as e:
+    print(e)
