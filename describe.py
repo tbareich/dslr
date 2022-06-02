@@ -1,16 +1,13 @@
-from classes.ds import DS
+from core.data_science import DataScience
 import argparse
 
-try:
-    parser = argparse.ArgumentParser(description='show data description.')
-    parser.add_argument('filename',
-                        type=str,
-                        help='the file containing the training data.')
+parser = argparse.ArgumentParser(description='show data description.')
+parser.add_argument('filename',
+                    type=str,
+                    help='the file containing the training data.')
 
-    args = parser.parse_args()
-    filename = args.filename
+args = parser.parse_args()
+filename = args.filename
 
-    ds = DS.read_csv(filename)
-    print(ds.describe())
-except Exception as e:
-    print(e)
+ds = DataScience.read_csv(filename)
+print(ds.describe())

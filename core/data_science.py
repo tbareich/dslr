@@ -10,7 +10,7 @@ sns.set_style("ticks")
 sns.color_palette("bright")
 
 
-class DS:
+class DataScience:
 
     def __init__(self, dataframe: pd.DataFrame) -> None:
         self.data = dataframe
@@ -36,7 +36,8 @@ class DS:
                        ncols: int = 4,
                        figsize=(16, 12),
                        show_all=False,
-                       kde=False):
+                       kde=False,
+                       features=[]):
         if show_all == False:
             df = self.data[[
                 "Hogwarts House", "Arithmancy", "Care of Magical Creatures",
@@ -162,7 +163,7 @@ class DS:
                 x += 1
             y += 1
         if show_all == False:
-            fig.suptitle("Pair plot of the remaining features", fontsize=16)
+            fig.suptitle("Pair plot of the remaining courses", fontsize=16)
             plt.subplots_adjust(left=0.04,
                                 bottom=0.05,
                                 right=0.93,
@@ -179,14 +180,9 @@ class DS:
         plt.show()
 
     @classmethod
-    def read_csv(cls, path: str) -> DS:
-        try:
-            data = pd.read_csv(path)
-            return cls(dataframe=data)
-        except OSError as e:
-            raise Exception(f'{path} file doesn\'t exist.')
-        except Exception:
-            raise Exception('Something went wrong.')
+    def read_csv(cls, path: str) -> DataScience:
+        data = pd.read_csv(path)
+        return cls(dataframe=data)
 
     def _get_quartile(self, column, q_quartile) -> float:
         # quartile position
