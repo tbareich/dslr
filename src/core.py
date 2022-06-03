@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import math
 
+from src.statistics import Statistics
+
 sns.set(font_scale=0.8)
 sns.set_style("ticks")
 sns.color_palette("bright")
@@ -12,39 +14,44 @@ sns.color_palette("bright")
 
 class DataScience:
 
-    def __init__(self, dataframe: pd.DataFrame) -> None:
-        self.data = dataframe
+    def __init__(self, data: pd.DataFrame) -> None:
+        self._data = data
 
     def describe(self) -> pd.DataFrame:
-        df = self.data.select_dtypes(include=['int64', 'float64'])
+        df = self._data.select_dtypes(include=['int64', 'float64'])
         describe_df = pd.DataFrame(
             index=["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"])
-
         for column_name in df:
             column = df[column_name][df[column_name].notna()].sort_values()
-            mean = column.sum() / column.size
-            std = np.sqrt(((column - mean)**2).sum() / (column.size - 1))
+            X = column.values
+            mean = Statistics.mean(X)
+            std = Statistics.std(X, mean)
             describe_df[column_name] = [
-                column.size, mean, std, column.iloc[0],
-                self._get_quartile(column, 1),
-                self._get_quartile(column, 2),
-                self._get_quartile(column, 3), column.iloc[column.size - 1]
+                column.size,
+                mean,
+                std,
+                X[0],
+                Statistics.percentil(X, 1),
+                Statistics.percentil(X, 2),
+                Statistics.percentil(X, 3),
+                X[len(X) - 1],
             ]
         return describe_df
 
-    def show_histogram(self,
-                       ncols: int = 4,
-                       figsize=(16, 12),
-                       show_all=False,
-                       kde=False,
-                       features=[]):
+    def show_histogram(
+            self,
+            ncols: int = 4,
+            figsize=(16, 12),
+            show_all=False,
+            kde=False,
+    ):
         if show_all == False:
-            df = self.data[[
+            df = self._data[[
                 "Hogwarts House", "Arithmancy", "Care of Magical Creatures",
                 "Potions"
             ]]
         else:
-            df = self.data.drop(
+            df = self._data.drop(
                 ["First Name", "Last Name", "Birthday", "Best Hand", "Index"],
                 axis=1)
         cols_len = df.shape[1] - 1
@@ -85,9 +92,9 @@ class DataScience:
     def show_scatter_plot(self, show_all=False):
         if show_all == False:
             fig = plt.figure()
-            sns.scatterplot(data=self.data,
-                            x=self.data["Astronomy"],
-                            y=self.data["Defense Against the Dark Arts"],
+            sns.scatterplot(data=self._data,
+                            x=self._data["Astronomy"],
+                            y=self._data["Defense Against the Dark Arts"],
                             linewidth=0,
                             s=10,
                             hue="Hogwarts House")
@@ -100,14 +107,14 @@ class DataScience:
     def show_pair_plot(self, show_all=False, figsize=(18, 12)):
         show_legend = True
         if show_all == False:
-            df = self.data.drop([
+            df = self._data.drop([
                 "First Name", "Last Name", "Birthday", "Best Hand", "Index",
                 "Arithmancy", "Defense Against the Dark Arts", "Potions",
                 "Care of Magical Creatures"
             ],
-                                axis=1)
+                                 axis=1)
         else:
-            df = self.data.drop(
+            df = self._data.drop(
                 ["First Name", "Last Name", "Birthday", "Best Hand", "Index"],
                 axis=1)
 
@@ -164,8 +171,8 @@ class DataScience:
             y += 1
         if show_all == False:
             fig.suptitle("Pair plot of the remaining courses", fontsize=16)
-            plt.subplots_adjust(left=0.04,
-                                bottom=0.05,
+            plt.subplots_adjust(left=0.06,
+                                bottom=0.07,
                                 right=0.93,
                                 top=0.95,
                                 hspace=0.4,
@@ -182,15 +189,4 @@ class DataScience:
     @classmethod
     def read_csv(cls, path: str) -> DataScience:
         data = pd.read_csv(path)
-        return cls(dataframe=data)
-
-    def _get_quartile(self, column, q_quartile) -> float:
-        # quartile position
-        qu_p = q_quartile * .25 * (column.size - 1)
-        # quartile index
-        qu_i = int(qu_p)
-        # quartile position fraction part
-        qu_fract = qu_p - int(qu_i)
-        quartile = column.iloc[qu_i] * (
-            1 - qu_fract) + column.iloc[qu_i + 1] * qu_fract
-        return quartile
+        return cls(data=data)

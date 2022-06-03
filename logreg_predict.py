@@ -1,10 +1,9 @@
 import argparse
 import os
-import re
 import pandas as pd
 
-from core.logistic_regression import LogisticRegression
-from core.preprocessing import Standarize
+from src.logistic_regression import LogisticRegression
+from src.preprocessing import StandarScaler
 
 try:
     parser = argparse.ArgumentParser(description='run your model')
@@ -35,23 +34,16 @@ try:
     mean = weights_file.values[:8, :1].T[0]
     std = weights_file.values[:8, 1:2].T[0]
 
-    standarize = Standarize(mean=mean, std=std)
+    standarize = StandarScaler(mean=mean, std=std)
     X = standarize.transform(X.T)
-    predictions = LogisticRegression(Lambda=0,
-                                     groups=groups,
-                                     mean=standarize.mean,
-                                     std=standarize.std,
-                                     W=weights).predict(X)
+    predictions = LogisticRegression(groups=groups, weights=weights).predict(X)
 
     filename = "out/house.csv"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     out = open(filename, "w")
-
-    out.write("Index,Hogwarts House\n")
-    for i in range(len(predictions)):
-        out.write(f"{i},{predictions[i]}")
-        if i < len(predictions) - 1:
-            out.write("\n")
-    out.close()
+    df = pd.DataFrame()
+    df["Index"] = list(range(len(predictions)))
+    df["Hogwarts House"] = predictions
+    df.to_csv(filename, index=False)
 except Exception as e:
     print(e)

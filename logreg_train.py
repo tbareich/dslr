@@ -1,10 +1,8 @@
 import argparse
-import os
 import pandas as pd
-import numpy as np
 
-from core.logistic_regression import LogisticRegression
-from core.preprocessing import Standarize
+from src.logistic_regression import LogisticRegression
+from src.preprocessing import StandarScaler
 
 try:
     parser = argparse.ArgumentParser(description='train your model')
@@ -24,12 +22,12 @@ try:
     parser.add_argument('-l',
                         '--Lambda',
                         type=float,
-                        default=0.1,
+                        default=0,
                         help='learning rate')
     parser.add_argument("-o",
                         '--out',
                         type=str,
-                        default=0.1,
+                        default="out/weights.csv",
                         help='weights output file')
 
     args = parser.parse_args()
@@ -54,17 +52,17 @@ try:
     Y = data["Hogwarts House"].values
     Y = Y.reshape((Y.shape[0], 1)).T
     X = data[features].values
-    standarize = Standarize()
+    standarize = StandarScaler()
     standarize.fit(X)
     X = standarize.transform(X.T)
-    LogisticRegression(X,
-                       Y,
-                       Lambda=args.Lambda,
-                       groups=groups,
-                       mean=standarize.mean,
-                       n_iter=args.n_iter,
-                       alpha=args.alpha,
-                       std=standarize.std).fit().save(path=args.out)
+    LogisticRegression(
+        n_iter=args.n_iter,
+        alpha=args.alpha,
+        Lambda=args.Lambda,
+        mean=standarize.mean,
+        std=standarize.std,
+        groups=groups,
+    ).fit(X=X, Y=Y).save(path=args.out)
 
 except Exception as e:
     print(e)

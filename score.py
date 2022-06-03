@@ -2,7 +2,7 @@ from sklearn.metrics import accuracy_score
 
 import pandas as pd
 
-house = pd.read_csv("outputs/house.csv")
+house = pd.read_csv("out/house.csv")
 truth = pd.read_csv("datasets/dataset_truth.csv")
 
 print(

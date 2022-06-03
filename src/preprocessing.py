@@ -1,7 +1,7 @@
-from core.statistics import Statistics
+from src.statistics import Statistics
 
 
-class Standarize:
+class StandarScaler:
 
     def __init__(self, mean=[], std=[]) -> None:
         self.mean = mean
