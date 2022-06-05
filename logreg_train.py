@@ -1,5 +1,6 @@
 import argparse
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from src.logistic_regression import LogisticRegression
 from src.preprocessing import StandarScaler
@@ -29,6 +30,17 @@ try:
                         type=str,
                         default="out/weights.csv",
                         help='weights output file')
+    parser.add_argument('--algo',
+                        type=str,
+                        default="bgd",
+                        help='choose optimization algorithm')
+    parser.add_argument('--batch_size',
+                        type=int,
+                        default=300,
+                        help='choose optimization algorithm')
+    parser.add_argument('--show_cost_hist',
+                        action='store_true',
+                        help='show cost history')
 
     args = parser.parse_args()
 
@@ -49,20 +61,39 @@ try:
     data = data.dropna(subset=["History of Magic"])
     data = data.dropna(subset=["Transfiguration"])
 
-    Y = data["Hogwarts House"].values
-    Y = Y.reshape((Y.shape[0], 1)).T
+    y = data["Hogwarts House"].values
+    y = y.reshape((1, y.shape[0]))
     X = data[features].values
     standarize = StandarScaler()
     standarize.fit(X)
     X = standarize.transform(X.T)
-    LogisticRegression(
+    lr = LogisticRegression(
         n_iter=args.n_iter,
         alpha=args.alpha,
         Lambda=args.Lambda,
         mean=standarize.mean,
         std=standarize.std,
         groups=groups,
-    ).fit(X=X, Y=Y).save(path=args.out)
+        algo=args.algo,
+        batch_size=args.batch_size,
+    ).fit(X=X, y=y).save(path=args.out)
+
+    if args.show_cost_hist:
+        fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+        plt.title("cost vs ephoc")
+        history = lr.get_cost_history()
+        i = 0
+        for group in groups:
+            cost = history[group]
+            y = i % 2
+            x = int(i / 2)
+            axs[y, x].plot(list(range(args.n_iter)), cost)
+            axs[y, x].set_xlabel("Ephochs")
+            axs[y, x].set_ylabel("Cost")
+            axs[y, x].set_title(group, fontsize=16)
+            i += 1
+        fig.suptitle('Cost vs Ephocs', fontsize=20)
+        plt.show()
 
 except Exception as e:
     print(e)

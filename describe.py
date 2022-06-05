@@ -1,4 +1,4 @@
-from src.core import DataScience
+from src.core import Core
 import argparse
 
 try:
@@ -10,7 +10,7 @@ try:
     args = parser.parse_args()
     filename = args.filename
 
-    ds = DataScience.read_csv(filename)
+    ds = Core.read_csv(filename)
     print(ds.describe())
 except Exception as e:
     print(e)

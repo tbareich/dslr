@@ -2,7 +2,6 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import numpy as np
 import math
 
 from src.statistics import Statistics
@@ -12,7 +11,7 @@ sns.set_style("ticks")
 sns.color_palette("bright")
 
 
-class DataScience:
+class Core:
 
     def __init__(self, data: pd.DataFrame) -> None:
         self._data = data
@@ -187,6 +186,6 @@ class DataScience:
         plt.show()
 
     @classmethod
-    def read_csv(cls, path: str) -> DataScience:
+    def read_csv(cls, path: str) -> Core:
         data = pd.read_csv(path)
         return cls(data=data)

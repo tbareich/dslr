@@ -1,4 +1,4 @@
-from src.core import DataScience
+from src.core import Core
 import argparse
 
 try:
@@ -17,7 +17,7 @@ try:
     filename = args.filename
     show_all = args.show_all
 
-    ds = DataScience.read_csv(filename)
+    ds = Core.read_csv(filename)
 
     ds.show_scatter_plot(show_all=show_all)
 except Exception as e:
