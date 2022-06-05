@@ -94,6 +94,5 @@ try:
             i += 1
         fig.suptitle('Cost vs Ephocs', fontsize=20)
         plt.show()
-
 except Exception as e:
     print(e)
