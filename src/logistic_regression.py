@@ -6,7 +6,7 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:28:39 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:28:41 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/06 18:22:20 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,13 +22,14 @@ class LogisticRegression:
     def __init__(self,
                  n_iter=1000,
                  alpha=0.1,
-                 Lambda=0,
+                 Lambda=0.1,
                  mean=[],
                  std=[],
                  groups=None,
                  algo="bgd",
                  batch_size=300,
-                 weights=np.array([])) -> None:
+                 weights=np.array([]),
+                 penalty=None) -> None:
 
         self.n_iter = n_iter
         self.alpha = alpha
@@ -40,6 +41,7 @@ class LogisticRegression:
         self.batch_size = batch_size
         self._cost_history = {}
         self.groups = groups
+        self.penalty = penalty
 
     def fit(self, X=None, y=None):
         if X is not None and y is not None:
@@ -67,7 +69,6 @@ class LogisticRegression:
         y_pred = self._h(self._W, X).T
         preds = []
         for i in range(len(y_pred)):
-            # print(y_pred[i])
             preds.append(self.groups[np.argmax(y_pred[i])])
         return preds
 
@@ -95,9 +96,26 @@ class LogisticRegression:
     def _h(self, theta, X):
         return self._g(self._f(theta, X))
 
-    def _loss(self, pred_y, y_ovr, m, l2):
+    def _loss(self, pred_y, y_ovr, m, p):
         return (-1 / m) * np.sum(y_ovr * np.log(pred_y) +
-                                 (1 - y_ovr) * np.log(1 - pred_y)) + np.sum(l2)
+                                 (1 - y_ovr) * np.log(1 - pred_y)) + p
+
+    def _penalty(self, weights):
+        if self.penalty == 'l1':
+            p = self.Lambda * np.sum(np.abs(weights))
+            dp = np.zeros(len(weights))
+            for i in range(len(weights)):
+                if weights[i] > 0:
+                    dp[i] = 1
+                elif weights[i] < 0:
+                    dp[i] = -1
+        elif self.penalty == 'l2':
+            p = (self.Lambda / 2) * np.sum(weights**2)
+            dp = self.Lambda * weights
+        else:
+            p = 0
+            dp = 0
+        return (p, dp)
 
     def _gradient_descent(self, X, y, group):
         m = y.shape[1]
@@ -105,34 +123,32 @@ class LogisticRegression:
         weights = np.zeros(X.shape[0])
         for _ in range(self.n_iter):
             pred_y = self._h(weights, X)
-            l2 = (self.Lambda / 2) * weights**2
-            l = self._loss(pred_y, y_ovr, m, l2)
+            p, dp = self._penalty(weights)
+            l = self._loss(pred_y, y_ovr, m, p)
             self._cost_history[group] = np.append(self._cost_history[group], l)
 
-            dl2 = self.Lambda * weights
             weights -= (self.alpha / m) * np.dot(
-                (pred_y - y_ovr), X.T)[0] + dl2
+                (pred_y - y_ovr), X.T)[0] + self.alpha * dp
         return weights
 
     def _stochastic_gradient_descent(self, X, y, group):
-        m = y.shape[1]
+        m = 1
         y_ovr = np.where(y == group, 1, 0)
         weights = np.zeros(X.shape[0])
         for _ in range(self.n_iter):
             column_index = np.random.choice(X.shape[1], replace=False)
             x = X[:, column_index].reshape((X.shape[0], 1))
             pred_y = self._h(weights, x)
-            l2 = (self.Lambda / 2) * weights**2
-            l = self._loss(pred_y, y_ovr[0][column_index], 1, l2)
+            p, dp = self._penalty(weights)
+            l = self._loss(pred_y, y_ovr[0][column_index], m, p)
             self._cost_history[group] = np.append(self._cost_history[group], l)
 
-            dl2 = self.Lambda * weights
             weights -= self.alpha * np.dot(
-                (pred_y - y_ovr[0][column_index]), x.T) + dl2
+                (pred_y - y_ovr[0][column_index]), x.T) + self.alpha * dp
         return weights
 
     def _mini_batch_gradient_descent(self, X, y, group):
-        m = y.shape[1]
+        m = self.batch_size
         y_ovr = np.where(y == group, 1, 0)
         weights = np.zeros(X.shape[0])
         for _ in range(self.n_iter):
@@ -141,11 +157,10 @@ class LogisticRegression:
                                        replace=False)
             new_X = X[:, columns]
             pred_y = self._h(weights, new_X)
-            l2 = (self.Lambda / 2) * weights**2
-            l = self._loss(pred_y, y_ovr[0][columns], self.batch_size, l2)
+            p, dp = self._penalty(weights)
+            l = self._loss(pred_y, y_ovr[0][columns], m, p)
             self._cost_history[group] = np.append(self._cost_history[group], l)
 
-            dl2 = self.Lambda * weights
-            weights -= (self.alpha / self.batch_size) * np.dot(
-                (pred_y - y_ovr[0][columns]), new_X.T) + dl2
+            weights -= (self.alpha / m) * np.dot(
+                (pred_y - y_ovr[0][columns]), new_X.T) + self.alpha * dp
         return weights

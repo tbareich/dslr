@@ -6,7 +6,7 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:28:50 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:28:51 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/06 18:21:55 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,11 +47,15 @@ try:
                         type=str,
                         default="bgd",
                         help='choose optimization algorithm')
+    parser.add_argument('--penalty',
+                        type=str,
+                        default=None,
+                        help='choose regularization (L1 & L2 Penalties)')
     parser.add_argument('--batch_size',
                         type=int,
                         default=300,
                         help='choose optimization algorithm')
-    parser.add_argument('--show_cost_hist',
+    parser.add_argument('--cost_hist',
                         action='store_true',
                         help='show cost history')
 
@@ -85,18 +89,18 @@ try:
     standarize = StandarScaler()
     standarize.fit(X)
     X = standarize.transform(X.T)
-    lr = LogisticRegression(
-        n_iter=args.n_iter,
-        alpha=args.alpha,
-        Lambda=args.Lambda,
-        mean=standarize.mean,
-        std=standarize.std,
-        groups=groups,
-        algo=args.algo,
-        batch_size=args.batch_size,
-    ).fit(X=X, y=y).save(path=args.out)
+    lr = LogisticRegression(n_iter=args.n_iter,
+                            alpha=args.alpha,
+                            Lambda=args.Lambda,
+                            mean=standarize.mean,
+                            std=standarize.std,
+                            groups=groups,
+                            algo=args.algo,
+                            batch_size=args.batch_size,
+                            penalty=args.penalty).fit(X=X,
+                                                      y=y).save(path=args.out)
 
-    if args.show_cost_hist:
+    if args.cost_hist:
         fig, axs = plt.subplots(2, 2, figsize=(16, 12))
         plt.title("cost vs ephoc")
         history = lr.get_cost_history()
