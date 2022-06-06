@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    logistic_regression.py                             :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/06/06 14:28:39 by tbareich          #+#    #+#              #
+#    Updated: 2022/06/06 14:28:41 by tbareich         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 from __future__ import annotations
 import os
 from tokenize import group

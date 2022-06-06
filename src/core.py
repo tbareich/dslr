@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    core.py                                            :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/06/06 14:29:40 by tbareich          #+#    #+#              #
+#    Updated: 2022/06/06 14:29:42 by tbareich         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 from __future__ import annotations
 import matplotlib.pyplot as plt
 import seaborn as sns
