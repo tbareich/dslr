@@ -17,9 +17,14 @@ try:
     args = parser.parse_args()
 
     features = [
-        "Defense Against the Dark Arts", "Herbology", "Divination", "Charms",
-        "Ancient Runes", "Muggle Studies", "History of Magic",
-        "Transfiguration"
+        "Herbology",
+        "Defense Against the Dark Arts",
+        "Divination",
+        "Muggle Studies",
+        "Ancient Runes",
+        "History of Magic",
+        "Transfiguration",
+        "Charms",
     ]
 
     groups = ["Hufflepuff", "Ravenclaw", "Gryffindor", "Slytherin"]

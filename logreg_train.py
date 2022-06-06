@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 from src.logistic_regression import LogisticRegression
 from src.preprocessing import StandarScaler
@@ -45,9 +46,14 @@ try:
     args = parser.parse_args()
 
     features = [
-        "Defense Against the Dark Arts", "Herbology", "Divination", "Charms",
-        "Ancient Runes", "Muggle Studies", "History of Magic",
-        "Transfiguration"
+        "Herbology",
+        "Defense Against the Dark Arts",
+        "Divination",
+        "Muggle Studies",
+        "Ancient Runes",
+        "History of Magic",
+        "Transfiguration",
+        "Charms",
     ]
     groups = ["Hufflepuff", "Ravenclaw", "Gryffindor", "Slytherin"]
 
@@ -94,5 +100,6 @@ try:
             i += 1
         fig.suptitle('Cost vs Ephocs', fontsize=20)
         plt.show()
+
 except Exception as e:
     print(e)

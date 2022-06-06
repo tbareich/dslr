@@ -108,7 +108,7 @@ class Core:
         if show_all == False:
             df = self._data.drop([
                 "First Name", "Last Name", "Birthday", "Best Hand", "Index",
-                "Arithmancy", "Defense Against the Dark Arts", "Potions",
+                "Arithmancy", "Astronomy", "Potions",
                 "Care of Magical Creatures"
             ],
                                  axis=1)

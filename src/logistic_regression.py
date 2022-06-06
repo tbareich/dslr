@@ -116,7 +116,7 @@ class LogisticRegression:
 
             dl2 = self.Lambda * weights
             weights -= self.alpha * np.dot(
-                (pred_y - y_ovr[0][column_index]), x.T)
+                (pred_y - y_ovr[0][column_index]), x.T) + dl2
         return weights
 
     def _mini_batch_gradient_descent(self, X, y, group):
