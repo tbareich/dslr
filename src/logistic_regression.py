@@ -52,10 +52,11 @@ class LogisticRegression:
 
     def predict(self, X):
         X = np.insert(X, 0, 1, axis=0)
-        _h = self._h(self._W, X).T
+        y_pred = self._h(self._W, X).T
         preds = []
-        for i in range(len(_h)):
-            preds.append(self.groups[np.argmax(_h[i])])
+        for i in range(len(y_pred)):
+            # print(y_pred[i])
+            preds.append(self.groups[np.argmax(y_pred[i])])
         return preds
 
     def get_cost_history(self):
@@ -82,9 +83,9 @@ class LogisticRegression:
     def _h(self, theta, X):
         return self._g(self._f(theta, X))
 
-    def _loss(self, pred_y, y_ovr, m, R1):
+    def _loss(self, pred_y, y_ovr, m, l2):
         return (-1 / m) * np.sum(y_ovr * np.log(pred_y) +
-                                 (1 - y_ovr) * np.log(1 - pred_y)) + R1
+                                 (1 - y_ovr) * np.log(1 - pred_y)) + np.sum(l2)
 
     def _gradient_descent(self, X, y, group):
         m = y.shape[1]
@@ -92,13 +93,13 @@ class LogisticRegression:
         weights = np.zeros(X.shape[0])
         for _ in range(self.n_iter):
             pred_y = self._h(weights, X)
-            R2 = (self.Lambda / m) * weights
-            weights -= (self.alpha / m) * np.dot((pred_y - y_ovr), X.T)[0] + R2
+            l2 = (self.Lambda / 2) * weights**2
+            l = self._loss(pred_y, y_ovr, m, l2)
+            self._cost_history[group] = np.append(self._cost_history[group], l)
 
-            R1 = (self.Lambda / 2 * m) * weights**2
-            l = self._loss(pred_y, y_ovr, m, R1)
-            self._cost_history[group] = np.append(self._cost_history[group],
-                                                  sum(l) / len(l))
+            dl2 = self.Lambda * weights
+            weights -= (self.alpha / m) * np.dot(
+                (pred_y - y_ovr), X.T)[0] + dl2
         return weights
 
     def _stochastic_gradient_descent(self, X, y, group):
@@ -109,15 +110,13 @@ class LogisticRegression:
             column_index = np.random.choice(X.shape[1], replace=False)
             x = X[:, column_index].reshape((X.shape[0], 1))
             pred_y = self._h(weights, x)
-            R2 = (self.Lambda / m) * weights
+            l2 = (self.Lambda / 2) * weights**2
+            l = self._loss(pred_y, y_ovr[0][column_index], 1, l2)
+            self._cost_history[group] = np.append(self._cost_history[group], l)
+
+            dl2 = self.Lambda * weights
             weights -= self.alpha * np.dot(
-                (pred_y - y_ovr[0][column_index]), x.T) + R2
-
-            R1 = (self.Lambda / 2 * m) * weights**2
-            l = self._loss(pred_y, y_ovr[0][column_index], 1, R1)
-            self._cost_history[group] = np.append(self._cost_history[group],
-                                                  sum(l) / len(l))
-
+                (pred_y - y_ovr[0][column_index]), x.T)
         return weights
 
     def _mini_batch_gradient_descent(self, X, y, group):
@@ -130,12 +129,11 @@ class LogisticRegression:
                                        replace=False)
             new_X = X[:, columns]
             pred_y = self._h(weights, new_X)
-            R2 = (self.Lambda / m) * weights
-            weights -= (self.alpha / self.batch_size) * np.dot(
-                (pred_y - y_ovr[0][columns]), new_X.T) + R2
+            l2 = (self.Lambda / 2) * weights**2
+            l = self._loss(pred_y, y_ovr[0][columns], self.batch_size, l2)
+            self._cost_history[group] = np.append(self._cost_history[group], l)
 
-            R1 = (self.Lambda / 2 * m) * weights**2
-            l = self._loss(pred_y, y_ovr[0][columns], self.batch_size, R1)
-            self._cost_history[group] = np.append(self._cost_history[group],
-                                                  sum(l) / len(l))
+            dl2 = self.Lambda * weights
+            weights -= (self.alpha / self.batch_size) * np.dot(
+                (pred_y - y_ovr[0][columns]), new_X.T) + dl2
         return weights
