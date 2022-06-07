@@ -6,14 +6,13 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:28:50 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 18:21:55 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:52:04 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
 from src.logistic_regression import LogisticRegression
 from src.preprocessing import StandarScaler

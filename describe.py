@@ -6,11 +6,11 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:29:19 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/07 08:38:03 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:51:50 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-from descriptive_statistic import DescriptiveStatistic
+from src.descriptive_statistic import DescriptiveStatistic
 import argparse
 
 try:

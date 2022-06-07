@@ -6,7 +6,7 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:29:40 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/07 08:37:52 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:54:36 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,15 +37,16 @@ class DescriptiveStatistic:
             X = column.values
             mean = Statistics.mean(X)
             std = Statistics.std(X, mean)
+            count = len(X)
             describe_df[column_name] = [
-                column.size,
+                count,
                 mean,
                 std,
                 X[0],
                 Statistics.percentil(X, 1),
                 Statistics.percentil(X, 2),
                 Statistics.percentil(X, 3),
-                X[len(X) - 1],
+                X[count - 1],
             ]
         return describe_df
 

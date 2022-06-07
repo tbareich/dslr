@@ -6,13 +6,12 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:28:28 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:28:30 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:51:58 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import argparse
 import os
-import numpy as np
 import pandas as pd
 
 from src.logistic_regression import LogisticRegression
