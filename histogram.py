@@ -6,11 +6,11 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:29:14 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:29:15 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:38:21 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-from src.core import Core
+from descriptive_statistic import DescriptiveStatistic
 import argparse
 
 try:
@@ -29,7 +29,7 @@ try:
     filename = args.filename
     show_all = args.show_all
 
-    ds = Core.read_csv(filename)
+    ds = DescriptiveStatistic.read_csv(filename)
 
     ds.show_histogram(show_all=show_all)
 except Exception as e:

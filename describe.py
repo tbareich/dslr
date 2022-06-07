@@ -6,11 +6,11 @@
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:29:19 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:29:20 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:38:03 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-from src.core import Core
+from descriptive_statistic import DescriptiveStatistic
 import argparse
 
 try:
@@ -22,7 +22,7 @@ try:
     args = parser.parse_args()
     filename = args.filename
 
-    ds = Core.read_csv(filename)
+    ds = DescriptiveStatistic.read_csv(filename)
     print(ds.describe())
 except Exception as e:
     print(e)

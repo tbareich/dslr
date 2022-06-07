@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    core.py                                            :+:      :+:    :+:    #
+#    descriptive_statistic.py                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: tbareich <tbareich@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/06 14:29:40 by tbareich          #+#    #+#              #
-#    Updated: 2022/06/06 14:29:42 by tbareich         ###   ########.fr        #
+#    Updated: 2022/06/07 08:37:52 by tbareich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ sns.set_style("ticks")
 sns.color_palette("bright")
 
 
-class Core:
+class DescriptiveStatistic:
 
     def __init__(self, data: pd.DataFrame) -> None:
         self._data = data
@@ -198,6 +198,6 @@ class Core:
         plt.show()
 
     @classmethod
-    def read_csv(cls, path: str) -> Core:
+    def read_csv(cls, path: str) -> DescriptiveStatistic:
         data = pd.read_csv(path)
         return cls(data=data)
